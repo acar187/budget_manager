@@ -1,7 +1,10 @@
 package com.budget_manager;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Observable;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,12 +12,24 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class MainController{
+
+    // FXML-Elemente
+    @FXML private TextField searchField;
+    @FXML private ComboBox<String> typeFilterBox;
+    @FXML private TextField categoryFilterField;
+    @FXML private DatePicker fromDatePicker;
+    @FXML private DatePicker toDatePicker;
 
     @FXML
     private TableView<Transaction> transactionTable;
@@ -52,7 +67,7 @@ public class MainController{
     }
 
     @FXML
-private void onAddTransactionClicked() {
+    private void onAddTransactionClicked() {
     try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/budget_manager/addTransactionDialog.fxml"));
         Parent root = loader.load();
@@ -73,5 +88,78 @@ private void onAddTransactionClicked() {
     }
 }
 
+    @FXML
+    private void onDeleteTransactionClicked() {
+        Transaction selectedTransaction = transactionTable.getSelectionModel().getSelectedItem();
+        if (selectedTransaction != null) {
+            TransactionDAO.deleteTransaction(selectedTransaction.getId());
+            transactionList.setAll(TransactionDAO.getAllTransactions());
+        }
+    }
+
+    @FXML
+    private void onEditTransactionClicked() {
+         System.out.println("Edit Transaction Button wurde geklickt!");
+        Transaction selectedTransaction = transactionTable.getSelectionModel().getSelectedItem();
+        if (selectedTransaction != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/budget_manager/editTransactionDialog.fxml"));
+                Parent root = loader.load();
+
+                EditTransactionController controller = loader.getController();
+                controller.setTransaction(selectedTransaction);
+                controller.setOnSaveCallback(() -> {
+                    transactionList.setAll(TransactionDAO.getAllTransactions());
+                });
+
+                Stage stage = new Stage();
+                stage.setTitle("Transaktion bearbeiten");
+                stage.setScene(new Scene(root));
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.showAndWait();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Keine Transaktion ausgewählt!");
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Click on a Transaction Field", ButtonType.OK);
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    private void onFilterClicked() {
+    // Beispiel: Filter-Logik oder einfach ein Testausdruck
+    System.out.println("Filter-Button geklickt!");
+
+    String search = searchField.getText().toLowerCase();
+    String type = typeFilterBox.getValue();
+    String category = categoryFilterField.getText().toLowerCase();
+    LocalDate from = fromDatePicker.getValue();
+    LocalDate to = toDatePicker.getValue();
+
+    List<Transaction> filtered = TransactionDAO.getAllTransactions().stream()
+        .filter(t -> (search.isEmpty() ||
+                      t.getDescription().toLowerCase().contains(search) ||
+                      String.valueOf(t.getAmount()).contains(search)))
+        .filter(t -> (type == null || type.equals("ALL") || t.getType().equals(type)))
+        .filter(t -> (category.isEmpty() || t.getCategory().toLowerCase().contains(category)))
+        .filter(t -> (from == null || !t.getDate().isBefore(from)))
+        .filter(t -> (to == null || !t.getDate().isAfter(to)))
+        .collect(Collectors.toList());
+
+    transactionList.setAll(filtered);
+    }
     
+    @FXML
+    private void onResetFilterClicked() {
+        System.out.println("Reset-Button geklickt!");
+        searchField.clear();
+        typeFilterBox.setValue("ALL");
+        categoryFilterField.clear();
+        fromDatePicker.setValue(null);
+        toDatePicker.setValue(null);    
+        transactionList.setAll(TransactionDAO.getAllTransactions());
+    }
 }

@@ -54,4 +54,31 @@ public class TransactionDAO {
 
         }
     }
+
+    public static void deleteTransaction(int id) {
+        String sql = "DELETE FROM transactions WHERE id = " + id;
+
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void updateTransaction(Transaction t) {
+        String sql = "UPDATE transactions SET amount = " + t.getAmount() +
+                ", type = '" + t.getType() +
+                "', category = '" + t.getCategory() +
+                "', description = '" + t.getDescription() +
+                "', date = '" + t.getDate() +
+                "' WHERE id = " + t.getId();
+
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
