@@ -3,6 +3,7 @@ package com.budget_manager;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -45,6 +47,8 @@ public class MainController{
     @FXML   
     private TableColumn<Transaction, String> amountColumn;
 
+    @FXML private PieChart expensePieChart;
+
     @FXML private Label incomeSumLabel;
     @FXML private Label expenseSumLabel;
     @FXML private Label balanceLabel;
@@ -69,6 +73,7 @@ public class MainController{
          // Lade Daten beim Start
         transactionList.setAll(TransactionDAO.getAllTransactions());
         updateSums();
+        updateExpensePieChart();
          // Delay focus until after UI is rendered
         javafx.application.Platform.runLater(() -> transactionTable.requestFocus());
     }
@@ -83,6 +88,7 @@ public class MainController{
         controller.setOnSaveCallback(() -> {
             transactionList.setAll(TransactionDAO.getAllTransactions());
             updateSums();
+            updateExpensePieChart();
         });
 
         Stage stage = new Stage();
@@ -103,6 +109,7 @@ public class MainController{
             TransactionDAO.deleteTransaction(selectedTransaction.getId());
             transactionList.setAll(TransactionDAO.getAllTransactions());
             updateSums();
+            updateExpensePieChart();
         }
     }
 
@@ -120,6 +127,7 @@ public class MainController{
                 controller.setOnSaveCallback(() -> {
                     transactionList.setAll(TransactionDAO.getAllTransactions());
                     updateSums();
+                    updateExpensePieChart();
                 });
 
                 Stage stage = new Stage();
@@ -161,6 +169,7 @@ public class MainController{
 
     transactionList.setAll(filtered);
     updateSums();
+    updateExpensePieChart();
     }
     
     @FXML
@@ -192,4 +201,19 @@ public class MainController{
         expenseSumLabel.setText(String.format("Expense: %.2f €", expense));
         balanceLabel.setText(String.format("Balance: %.2f €", balance));
     }
+
+    private void updateExpensePieChart() {
+        Map<String, Double> categorySums = transactionList.stream()
+            .filter(t -> "EXPENSE".equalsIgnoreCase(t.getType()))
+            .collect(Collectors.groupingBy(
+            Transaction::getCategory,
+            Collectors.summingDouble(Transaction::getAmount)
+            ));
+
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        for (Map.Entry<String, Double> entry : categorySums.entrySet()) {
+            pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+        }
+        expensePieChart.setData(pieChartData);
+}
 }
