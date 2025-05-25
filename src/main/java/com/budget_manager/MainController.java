@@ -16,6 +16,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -43,6 +44,10 @@ public class MainController{
     private TableColumn<Transaction, String> dateColumn;
     @FXML   
     private TableColumn<Transaction, String> amountColumn;
+
+    @FXML private Label incomeSumLabel;
+    @FXML private Label expenseSumLabel;
+    @FXML private Label balanceLabel;
     
     private final ObservableList<Transaction> transactionList = FXCollections.observableArrayList();
 
@@ -61,9 +66,11 @@ public class MainController{
 
 
         transactionTable.setItems(transactionList);
-
          // Lade Daten beim Start
         transactionList.setAll(TransactionDAO.getAllTransactions());
+        updateSums();
+         // Delay focus until after UI is rendered
+        javafx.application.Platform.runLater(() -> transactionTable.requestFocus());
     }
 
     @FXML
@@ -75,6 +82,7 @@ public class MainController{
         AddTransactionController controller = loader.getController();
         controller.setOnSaveCallback(() -> {
             transactionList.setAll(TransactionDAO.getAllTransactions());
+            updateSums();
         });
 
         Stage stage = new Stage();
@@ -94,6 +102,7 @@ public class MainController{
         if (selectedTransaction != null) {
             TransactionDAO.deleteTransaction(selectedTransaction.getId());
             transactionList.setAll(TransactionDAO.getAllTransactions());
+            updateSums();
         }
     }
 
@@ -110,6 +119,7 @@ public class MainController{
                 controller.setTransaction(selectedTransaction);
                 controller.setOnSaveCallback(() -> {
                     transactionList.setAll(TransactionDAO.getAllTransactions());
+                    updateSums();
                 });
 
                 Stage stage = new Stage();
@@ -150,6 +160,7 @@ public class MainController{
         .collect(Collectors.toList());
 
     transactionList.setAll(filtered);
+    updateSums();
     }
     
     @FXML
@@ -161,5 +172,24 @@ public class MainController{
         fromDatePicker.setValue(null);
         toDatePicker.setValue(null);    
         transactionList.setAll(TransactionDAO.getAllTransactions());
+        updateSums();
+    }
+
+    private void updateSums() {
+        double income = transactionList.stream()
+            .filter(t -> "INCOME".equalsIgnoreCase(t.getType()))
+            .mapToDouble(Transaction::getAmount)
+            .sum();
+
+        double expense = transactionList.stream()
+            .filter(t -> "EXPENSE".equalsIgnoreCase(t.getType()))
+            .mapToDouble(Transaction::getAmount)
+            .sum();
+
+        double balance = income - expense;
+
+        incomeSumLabel.setText(String.format("Income: %.2f €", income));
+        expenseSumLabel.setText(String.format("Expense: %.2f €", expense));
+        balanceLabel.setText(String.format("Balance: %.2f €", balance));
     }
 }
