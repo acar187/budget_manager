@@ -1,11 +1,20 @@
 package com.budget_manager;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.stream.Collectors;
+
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.*;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,6 +31,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -215,5 +225,79 @@ public class MainController{
             pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
         }
         expensePieChart.setData(pieChartData);
+}
+    @FXML
+        private void onExportCsvClicked() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exportiere Transaktionen als CSV");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV-Files", "*.csv"));
+        java.io.File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try (FileWriter writer = new FileWriter(file)) {
+             // Kopfzeile
+                writer.write("Datum,Typ,Kategorie,Beschreibung,Betrag\n");
+                for (Transaction t : transactionList) {
+                    writer.write(String.format("%s,%s,%s,%s,%.2f\n",
+                        t.getDate(),
+                        t.getType(),
+                        t.getCategory(),
+                        t.getDescription().replace(",", " "), // Kommas entfernen
+                        t.getAmount()
+                    ));
+                }
+                writer.flush();
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Export erfolgreich!", ButtonType.OK);
+                alert.showAndWait();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Fehler beim Export!", ButtonType.OK);
+                alert.showAndWait();
+            }
+     }
+    }
+
+    @FXML
+    private void onExportPdfClicked() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exportiere Transaktionen als PDF");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF-Dateien", "*.pdf"));
+        java.io.File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+        try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, new java.io.FileOutputStream(file));
+            document.open();
+
+            // Titel
+            document.add(new Paragraph("Transaktionen", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18)));
+            document.add(new Paragraph(" ")); // Leerzeile
+
+            // Tabelle
+            PdfPTable table = new PdfPTable(5);
+            table.addCell("Datum");
+            table.addCell("Typ");
+            table.addCell("Kategorie");
+            table.addCell("Beschreibung");
+            table.addCell("Betrag");
+
+            for (Transaction t : transactionList) {
+                table.addCell(t.getDate().toString());
+                table.addCell(t.getType());
+                table.addCell(t.getCategory());
+                table.addCell(t.getDescription());
+                table.addCell(String.format("%.2f", t.getAmount()));
+            }
+
+            document.add(table);
+            document.close();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Export als PDF erfolgreich!", ButtonType.OK);
+            alert.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Fehler beim PDF-Export!", ButtonType.OK);
+            alert.showAndWait();
+        }
+    }
 }
 }
