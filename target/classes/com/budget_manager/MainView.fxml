@@ -92,19 +92,20 @@
         <Label fx:id="balanceLabel" text="Saldo: 0.00 €"/>
     </children>
 </HBox> -->
-      <HBox alignment="CENTER_LEFT" prefHeight="59.0" prefWidth="490.0">
+      <HBox alignment="CENTER" prefHeight="59.0" prefWidth="490.0" spacing="10.0">
          <children>
             <Button mnemonicParsing="false" onAction="#onAddTransactionClicked" prefHeight="35.0" prefWidth="120.0" text="Add Transaction">
                <HBox.margin>
-                  <Insets right="10.0" />
+                  <Insets />
                </HBox.margin>
             </Button>
             <Button mnemonicParsing="false" onAction="#onEditTransactionClicked" prefHeight="35.0" prefWidth="120.0" text="Edit Transaction">
                <HBox.margin>
-                  <Insets right="10.0" />
+                  <Insets />
                </HBox.margin>
             </Button>
             <Button mnemonicParsing="false" onAction="#onDeleteTransactionClicked" prefHeight="35.0" prefWidth="120.0" text="Delete Transaction" />
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onManageCategoriesClicked" prefHeight="35.0" prefWidth="125.0" text="Manage Categories" />
          </children>
          <opaqueInsets>
             <Insets />

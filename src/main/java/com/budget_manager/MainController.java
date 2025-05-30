@@ -92,7 +92,7 @@ public class MainController{
         });
 
         Stage stage = new Stage();
-        stage.setTitle("Neue Transaktion");
+        stage.setTitle("New Transaction");
         stage.setScene(new Scene(root));
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
@@ -131,7 +131,7 @@ public class MainController{
                 });
 
                 Stage stage = new Stage();
-                stage.setTitle("Transaktion bearbeiten");
+                stage.setTitle("Edit Transaction");
                 stage.setScene(new Scene(root));
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.showAndWait();
@@ -143,6 +143,30 @@ public class MainController{
             System.out.println("Keine Transaktion ausgewählt!");
             Alert alert = new Alert(Alert.AlertType.ERROR, "Click on a Transaction Field", ButtonType.OK);
             alert.showAndWait();
+        }
+    }
+
+    @FXML
+    private void onManageCategoriesClicked() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/budget_manager/manageCategoriesDialog.fxml"));
+            Parent root = loader.load();
+
+            // ManageCategoriesController controller = loader.getController();
+            // controller.setOnSaveCallback(() -> {
+            //     // Aktualisiere die Kategorien in der ComboBox
+            //     typeFilterBox.setItems(FXCollections.observableArrayList("ALL", "INCOME", "EXPENSE"));
+            //     typeFilterBox.getSelectionModel().select("ALL");
+            // });
+
+            Stage stage = new Stage();
+            stage.setTitle("Manage Categories");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -216,4 +240,6 @@ public class MainController{
         }
         expensePieChart.setData(pieChartData);
 }
+
+ 
 }
