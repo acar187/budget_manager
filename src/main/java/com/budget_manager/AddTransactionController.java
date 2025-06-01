@@ -48,17 +48,16 @@ public class AddTransactionController {
     @FXML
     private void onAddCategory() {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setHeaderText("Neue Kategorie hinzufügen");
+        dialog.setHeaderText("Add New Category");
         dialog.setContentText("Name:");
+        
 
         dialog.showAndWait().ifPresent(name -> {
             if (!name.isBlank()) {
                 Category c = new Category(name);
                 CategoryDAO.insertCategory(c);
                 loadCategories(); // Reload categories after adding a new one
-                // Optionally, you can set the newly added category as the selected value
-                //categoryField.clear(); // Clear the text field
-                //categoryBox.getItems().add(c); // Add to the ComboBox
+                
                 categoryBox.setValue(c); // Set the newly added category as selected
                 
             }

@@ -13,15 +13,6 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("Budget Manager");
         primaryStage.show();
-
-        Category category = new Category(1, "Food");
-        System.out.println("Category ID: " + category.getId());
-        System.out.println("Category Name: " + category.getName());
-        
-        // System.out.println("All Categories: " + CategoryDAO.getAllCategories());
-        // CategoryDAO.insertCategory(new Category("Transport"));
-        // System.out.println("After inserting new category: " + CategoryDAO.getAllCategories());
-        
         
     }
 

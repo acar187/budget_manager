@@ -54,6 +54,7 @@ public class MainController{
     @FXML private Label balanceLabel;
     
     private final ObservableList<Transaction> transactionList = FXCollections.observableArrayList();
+    private final ObservableList<Category> categoriesList = FXCollections.observableArrayList();
 
     public void initialize() {
         dateColumn.setCellValueFactory(data -> 
@@ -111,6 +112,11 @@ public class MainController{
             updateSums();
             updateExpensePieChart();
         }
+        else {
+            System.out.println("Keine Transaktion ausgewählt!");
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Click on a Transaction Field", ButtonType.OK);
+            alert.showAndWait();
+        }
     }
 
     @FXML
@@ -152,12 +158,19 @@ public class MainController{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/budget_manager/manageCategoriesDialog.fxml"));
             Parent root = loader.load();
 
-            // ManageCategoriesController controller = loader.getController();
-            // controller.setOnSaveCallback(() -> {
-            //     // Aktualisiere die Kategorien in der ComboBox
-            //     typeFilterBox.setItems(FXCollections.observableArrayList("ALL", "INCOME", "EXPENSE"));
-            //     typeFilterBox.getSelectionModel().select("ALL");
-            // });
+            ManageCategoriesController controller = loader.getController();
+
+            controller.setOnCategoryChangedCallback(() -> {
+                categoriesList.setAll(CategoryDAO.getAllCategories());
+            
+            // controller.setOnCategoryChangedCallback(() -> {
+            //     // Aktualisiere die Kategorien in der Filter-ComboBox
+            //     List<String> categories = CategoryDAO.getAllCategories().stream()
+            //         .map(Category::getName)
+            //         .collect(Collectors.toList());
+            //     categories.add(0, "ALL"); // Füge "ALL" als erste Option hinzu
+            //     typeFilterBox.setItems(FXCollections.observableArrayList(categories));
+             });
 
             Stage stage = new Stage();
             stage.setTitle("Manage Categories");
@@ -239,7 +252,7 @@ public class MainController{
             pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
         }
         expensePieChart.setData(pieChartData);
-}
+    }
 
  
 }
