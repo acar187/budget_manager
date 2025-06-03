@@ -33,17 +33,12 @@ public class ManageCategoriesController {
     @FXML
     private TextField categoryField;
     private TextInputControl dialogControl;
-    
-    // private List<Category> cList;
-
-    // private String categoryDAO;
 
     @FXML   
     public void initialize() {
         // Set up the category table
         nameColumn.setCellValueFactory(data -> 
             javafx.beans.binding.Bindings.createStringBinding(data.getValue()::getName));
-
         categoryTable.setItems(categoryList);
         //  // Lade Daten beim Start
         categoryList.setAll(CategoryDAO.getAllCategories());
@@ -55,8 +50,6 @@ public class ManageCategoriesController {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText("Add New Category");
         dialog.setContentText("Name:");
-        
-
         dialog.showAndWait().ifPresent(name -> {
             if (!name.isBlank()) {
                 Category c = new Category(name);
@@ -77,7 +70,6 @@ public class ManageCategoriesController {
             categoryList.remove(selectedCategory);
         } else {
             System.out.println("No category selected for deletion.");
-            // Optionally, you can show an alert to the user
             Alert alert = new Alert(Alert.AlertType.WARNING, "Please select a category to delete.");
             alert.setTitle("No Category Selected");
             alert.setHeaderText(null);
@@ -94,10 +86,6 @@ public class ManageCategoriesController {
             alert.showAndWait();
 
         }
-        // Implement editing logic here
-        // For example, you can show a dialog to select a category to edit
-        // and then call CategoryDAO.updateCategory(category);
-        // You might also want to show a TextInputDialog to get the new name
         TextInputDialog dialog = new TextInputDialog(getSelectedCategory().getName());
         dialog.setHeaderText("Edit Category");
         dialog.setContentText("New Name:");
@@ -109,17 +97,8 @@ public class ManageCategoriesController {
                 categoryList.set(categoryList.indexOf(selectedCategory), selectedCategory); // Update the list 
             }
         });
-
-        
-
     }
     
-
-    public void setCategory(Category c) {
-        this.category = c;
-        dialogControl.setText(c.getName());
-        
-    }
     private Category getSelectedCategory() {
         // Implement logic to get the currently selected category
         // This could be from a ComboBox or ListView in your UI
@@ -133,14 +112,10 @@ public class ManageCategoriesController {
         // This could be done by getting the current stage and closing it
         Stage stage = (Stage) categoryTable.getScene().getWindow();
         stage.close();
-        
-        
     }
     
-   public void setOnCategoryChangedCallback(Runnable callback) {
-        // This method can be used to set a callback that will be called when categories are changed
+    public void setOnCategoryChangedCallback(Runnable callback) {
         // For example, you can call this after adding, editing, or deleting a category
-        // callback.run();
         this.onCategoryChangedCallback = callback;
     }   
 }

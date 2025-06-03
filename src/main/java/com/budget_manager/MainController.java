@@ -157,27 +157,15 @@ public class MainController{
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/budget_manager/manageCategoriesDialog.fxml"));
             Parent root = loader.load();
-
             ManageCategoriesController controller = loader.getController();
-
             controller.setOnCategoryChangedCallback(() -> {
                 categoriesList.setAll(CategoryDAO.getAllCategories());
-            
-            // controller.setOnCategoryChangedCallback(() -> {
-            //     // Aktualisiere die Kategorien in der Filter-ComboBox
-            //     List<String> categories = CategoryDAO.getAllCategories().stream()
-            //         .map(Category::getName)
-            //         .collect(Collectors.toList());
-            //     categories.add(0, "ALL"); // Füge "ALL" als erste Option hinzu
-            //     typeFilterBox.setItems(FXCollections.observableArrayList(categories));
              });
-
             Stage stage = new Stage();
             stage.setTitle("Manage Categories");
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -185,28 +173,25 @@ public class MainController{
 
     @FXML
     private void onFilterClicked() {
-    // Beispiel: Filter-Logik oder einfach ein Testausdruck
-    System.out.println("Filter-Button geklickt!");
+        String search = searchField.getText().toLowerCase();
+        String type = typeFilterBox.getValue();
+        String category = categoryFilterField.getText().toLowerCase();
+        LocalDate from = fromDatePicker.getValue();
+        LocalDate to = toDatePicker.getValue();
 
-    String search = searchField.getText().toLowerCase();
-    String type = typeFilterBox.getValue();
-    String category = categoryFilterField.getText().toLowerCase();
-    LocalDate from = fromDatePicker.getValue();
-    LocalDate to = toDatePicker.getValue();
-
-    List<Transaction> filtered = TransactionDAO.getAllTransactions().stream()
-        .filter(t -> (search.isEmpty() ||
+        List<Transaction> filtered = TransactionDAO.getAllTransactions().stream()
+            .filter(t -> (search.isEmpty() ||
                       t.getDescription().toLowerCase().contains(search) ||
                       String.valueOf(t.getAmount()).contains(search)))
-        .filter(t -> (type == null || type.equals("ALL") || t.getType().equals(type)))
-        .filter(t -> (category.isEmpty() || t.getCategory().toLowerCase().contains(category)))
-        .filter(t -> (from == null || !t.getDate().isBefore(from)))
-        .filter(t -> (to == null || !t.getDate().isAfter(to)))
-        .collect(Collectors.toList());
+            .filter(t -> (type == null || type.equals("ALL") || t.getType().equals(type)))
+            .filter(t -> (category.isEmpty() || t.getCategory().toLowerCase().contains(category)))
+            .filter(t -> (from == null || !t.getDate().isBefore(from)))
+            .filter(t -> (to == null || !t.getDate().isAfter(to)))
+            .collect(Collectors.toList());
 
-    transactionList.setAll(filtered);
-    updateSums();
-    updateExpensePieChart();
+        transactionList.setAll(filtered);
+        updateSums();
+        updateExpensePieChart();
     }
     
     @FXML
@@ -240,19 +225,36 @@ public class MainController{
     }
 
     private void updateExpensePieChart() {
-        Map<String, Double> categorySums = transactionList.stream()
-            .filter(t -> "EXPENSE".equalsIgnoreCase(t.getType()))
-            .collect(Collectors.groupingBy(
-            Transaction::getCategory,
-            Collectors.summingDouble(Transaction::getAmount)
-            ));
+    //     Map<String, Double> categorySums = transactionList.stream()
+    //         .filter(t -> "EXPENSE".equalsIgnoreCase(t.getType()))
+    //         .collect(Collectors.groupingBy(
+    //         Transaction::getCategory,
+    //         Collectors.summingDouble(Transaction::getAmount)
+    //         ));
 
-        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-        for (Map.Entry<String, Double> entry : categorySums.entrySet()) {
-            pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
-        }
-        expensePieChart.setData(pieChartData);
+    //     ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+    //     for (Map.Entry<String, Double> entry : categorySums.entrySet()) {
+    //         pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+    //     }
+    //     expensePieChart.setData(pieChartData);
+    // }
+    double incomeSum = transactionList.stream()
+        .filter(t -> "INCOME".equalsIgnoreCase(t.getType()))
+        .mapToDouble(Transaction::getAmount)
+        .sum();
+
+    double expenseSum = transactionList.stream()
+        .filter(t -> "EXPENSE".equalsIgnoreCase(t.getType()))
+        .mapToDouble(Transaction::getAmount)
+        .sum();
+
+    ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+    if (incomeSum > 0) {
+        pieChartData.add(new PieChart.Data("INCOME", incomeSum));
     }
-
- 
+    if (expenseSum > 0) {
+        pieChartData.add(new PieChart.Data("EXPENSE", expenseSum));
+    }
+    expensePieChart.setData(pieChartData);
+    }
 }
