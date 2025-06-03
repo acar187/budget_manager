@@ -8,9 +8,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 
@@ -18,19 +23,16 @@ import javafx.stage.Stage;
 
 public class ManageCategoriesController {
 
-private Runnable onCategoryChangedCallback;
-    
-
-    @FXML
-    private TableColumn<Category, String> nameColumn;
-    @FXML 
-    private TableView<Category> categoryTable;
-    
-
+   
+    @FXML private TableColumn<Category, String> nameColumn;
+    @FXML private TableView<Category> categoryTable;
     @FXML private ComboBox<Category> categoryBox;
-
+    private Runnable onCategoryChangedCallback;
     private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
-
+    private Category category;
+    @FXML
+    private TextField categoryField;
+    private TextInputControl dialogControl;
     
     // private List<Category> cList;
 
@@ -48,21 +50,6 @@ private Runnable onCategoryChangedCallback;
        
     }
 
-    // @FXML
-    // private void loadCategories() {
-           
-    //     cList = CategoryDAO.getAllCategories();
-    //     categoryBox.setItems(FXCollections.observableArrayList(cList));
-    //     categoryTable.getItems().setAll(cList);
-
-    //     System.out.println("categoryDAO: " + categoryDAO);
-    //     System.out.println("categoryTableView: " + categoryTable);
-    //     if (categoryDAO == null || categoryTable == null) {
-    //     throw new IllegalStateException("Controller not properly initialized");
-    // }
-
-    //}
-
     @FXML
     private void onAddCategoryClicked() {
         TextInputDialog dialog = new TextInputDialog();
@@ -78,52 +65,60 @@ private Runnable onCategoryChangedCallback;
                 onCategoryChangedCallback.run();
             }
                 //categoryList.add(c); // Add the new category to the list
-                categoryTable.getItems().add(c); // Add the new category to the table
-                 
-                //loadCategories(); // Reload categories after adding a new one
-                
-                //categoryBox.setValue(c); // Set the newly added category as selected
-                
+                categoryTable.getItems().add(c); // Add the new category to the table    
             }
         });
     }
 
     @FXML void onDeleteClicked() {
-        
         if (getSelectedCategory() != null) {
             Category selectedCategory = getSelectedCategory();
             CategoryDAO.deleteCategory(selectedCategory);
             categoryList.remove(selectedCategory);
-            
         } else {
-            
             System.out.println("No category selected for deletion.");
             // Optionally, you can show an alert to the user
             Alert alert = new Alert(Alert.AlertType.WARNING, "Please select a category to delete.");
             alert.setTitle("No Category Selected");
             alert.setHeaderText(null);
             alert.showAndWait();
-
         }
     }
     @FXML void onEditClicked() {
+
+        if (getSelectedCategory() == null) {
+            Alert alert = new Alert(null);
+            alert.setAlertType(Alert.AlertType.WARNING);
+            alert.setTitle("No Category Selected");
+            alert.setHeaderText("Please select a category to edit.");
+            alert.showAndWait();
+
+        }
         // Implement editing logic here
         // For example, you can show a dialog to select a category to edit
         // and then call CategoryDAO.updateCategory(category);
         // You might also want to show a TextInputDialog to get the new name
-        TextInputDialog dialog = new TextInputDialog();
+        TextInputDialog dialog = new TextInputDialog(getSelectedCategory().getName());
         dialog.setHeaderText("Edit Category");
         dialog.setContentText("New Name:");
         dialog.showAndWait().ifPresent(newName -> {
             if (!newName.isBlank()) {
-                // Assuming you have a way to get the selected category
-                Category selectedCategory = getSelectedCategory(); // Implement this method
+                Category selectedCategory = getSelectedCategory(); 
                 selectedCategory.setName(newName);
                 CategoryDAO.updateCategory(selectedCategory);
-                //loadCategories(); // Reload categories after editing
+                categoryList.set(categoryList.indexOf(selectedCategory), selectedCategory); // Update the list 
             }
         });
 
+        
+
+    }
+    
+
+    public void setCategory(Category c) {
+        this.category = c;
+        dialogControl.setText(c.getName());
+        
     }
     private Category getSelectedCategory() {
         // Implement logic to get the currently selected category
