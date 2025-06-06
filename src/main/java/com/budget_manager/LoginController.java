@@ -16,6 +16,7 @@ public class LoginController {
     @FXML TextField usernameField;
     @FXML TextField passwordField;
     @FXML Label errorLabel;
+    Boolean Registered = false;
     
     public void onLogin() throws SQLException, IOException {
         String username = usernameField.getText();
@@ -46,5 +47,21 @@ public class LoginController {
             // Show an error message to the user
             errorLabel.setText("Invalid username or password.");
         }
+    }
+
+    public void onRegister() throws IOException, SQLException {
+        String username = usernameField.getText();
+        String password = passwordField.getText();
+
+        Registered = UserDAO.registerUser(username, password);
+        if (!Registered) {
+            errorLabel.setText("Username already exists. Please choose a different username.");
+            return;
+        }
+        else{
+            // Open the registration view
+        onLogin();
+        }
+        
     }
 }
