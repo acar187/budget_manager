@@ -55,7 +55,6 @@ public class MainController{
     
     private final ObservableList<Transaction> transactionList = FXCollections.observableArrayList();
     private final ObservableList<Category> categoriesList = FXCollections.observableArrayList();
-    private User currentUser;
 
     public void initialize() {
         dateColumn.setCellValueFactory(data -> 
@@ -73,8 +72,8 @@ public class MainController{
 
         transactionTable.setItems(transactionList);
          // Lade Daten beim Start
-        transactionList.setAll(TransactionDAO.getAllTransactions());
-        //transactionList.setAll(TransactionDAO.getTransactionsByUser(Session.getCurrentUser().getId()));
+        //transactionList.setAll(TransactionDAO.getAllTransactions());
+        transactionList.setAll(TransactionDAO.getTransactionsByUser(Session.getCurrentUser().getId()));
         updateSums();
         updateExpensePieChart();
          // Delay focus until after UI is rendered
@@ -89,8 +88,8 @@ public class MainController{
 
         AddTransactionController controller = loader.getController();
         controller.setOnSaveCallback(() -> {
-            //transactionList.setAll(TransactionDAO.getTransactionsByUser(Session.getCurrentUser().getId()));
-            transactionList.setAll(TransactionDAO.getAllTransactions());
+            transactionList.setAll(TransactionDAO.getTransactionsByUser(Session.getCurrentUser().getId()));
+            //transactionList.setAll(TransactionDAO.getAllTransactions());
             updateSums();
             updateExpensePieChart();
         });
@@ -111,7 +110,8 @@ public class MainController{
         Transaction selectedTransaction = transactionTable.getSelectionModel().getSelectedItem();
         if (selectedTransaction != null) {
             TransactionDAO.deleteTransaction(selectedTransaction.getId());
-            transactionList.setAll(TransactionDAO.getAllTransactions());
+            //transactionList.setAll(TransactionDAO.getAllTransactions())
+            transactionList.setAll(TransactionDAO.getTransactionsByUser(Session.getCurrentUser().getId()));
             updateSums();
             updateExpensePieChart();
         }
@@ -134,7 +134,8 @@ public class MainController{
                 EditTransactionController controller = loader.getController();
                 controller.setTransaction(selectedTransaction);
                 controller.setOnSaveCallback(() -> {
-                    transactionList.setAll(TransactionDAO.getAllTransactions());
+                    //transactionList.setAll(TransactionDAO.getAllTransactions());
+                    transactionList.setAll(TransactionDAO.getTransactionsByUser(Session.getCurrentUser().getId()));
                     updateSums();
                     updateExpensePieChart();
                 });
@@ -205,7 +206,8 @@ public class MainController{
         categoryFilterField.clear();
         fromDatePicker.setValue(null);
         toDatePicker.setValue(null);    
-        transactionList.setAll(TransactionDAO.getAllTransactions());
+        //transactionList.setAll(TransactionDAO.getAllTransactions());
+        transactionList.setAll(TransactionDAO.getTransactionsByUser(Session.getCurrentUser().getId()));
         updateSums();
     }
 
@@ -257,14 +259,7 @@ public class MainController{
     }
     if (expenseSum > 0) {
         pieChartData.add(new PieChart.Data("EXPENSE", expenseSum));
-    }
-    expensePieChart.setData(pieChartData);
-    }
-
-    public void setCurrentUser(User user) {
-        this.currentUser = user;
-        //List<Transaction> userTransactions = TransactionDAO.getTransactionsByUser(currentUser.getId());
-       //transactionTable.setItems(FXCollections.observableArrayList(userTransactions));
-
-    }
+        }
+        expensePieChart.setData(pieChartData);
+        }
 }

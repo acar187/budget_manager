@@ -29,14 +29,16 @@ public class LoginController {
             // Proceed to the main application view
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/budget_manager/MainView.fxml"));
             Parent root = loader.load();
-            
             //MainController mainController = loader.getController();
             //mainController.setCurrentUser(user);
-
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.setTitle("Budget Manager - " + user.getUsername());
             stage.show();
+
+            // Close the login window
+            Stage loginStage = (Stage) usernameField.getScene().getWindow();
+            loginStage.close();
 
 
         } else {

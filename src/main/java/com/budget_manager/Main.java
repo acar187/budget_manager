@@ -14,13 +14,13 @@ public class Main extends Application {
         primaryStage.setTitle("Budget Manager");
         primaryStage.show();
 
-        // UserDAO.registerUser("Erkan","password123");
-        // User user = UserDAO.login("Erkan", "password123");
-        // if (user != null) {
-        //     System.out.println("User logged in: " + user.getUsername());
+        //  UserDAO.registerUser("Emel","password123");
+        //  User user = UserDAO.login("Emel", "password123");
+        //  if (user != null) {
+        //      System.out.println("User logged in: " + user.getUsername());
         // } else {
         //     System.out.println("Login failed.");
-        // }
+        //  }
 
     }
     public static void main(String[] args) {
