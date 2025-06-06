@@ -35,6 +35,12 @@
         <artifactId>javafx-graphics</artifactId>
         <version>17.0.10</version>
     </dependency>
+    
+    <dependency> 
+    <groupId>org.mindrot</groupId> 
+    <artifactId>jbcrypt</artifactId> 
+    <version>0.4</version> 
+    </dependency>
     </dependencies>
     <build>
         <plugins>

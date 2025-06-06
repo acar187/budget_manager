@@ -8,11 +8,20 @@ import javafx.stage.Stage;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/budget_manager/MainView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/budget_manager/login_view.fxml"));
         Scene scene = new Scene(loader.load());
         primaryStage.setScene(scene);
         primaryStage.setTitle("Budget Manager");
         primaryStage.show();
+
+        // UserDAO.registerUser("Erkan","password123");
+        // User user = UserDAO.login("Erkan", "password123");
+        // if (user != null) {
+        //     System.out.println("User logged in: " + user.getUsername());
+        // } else {
+        //     System.out.println("Login failed.");
+        // }
+
     }
     public static void main(String[] args) {
         launch(args);

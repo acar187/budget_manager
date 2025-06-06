@@ -11,21 +11,24 @@ public class Transaction {
     private String category;
     private String description;
     private LocalDate date;
+    private int userId;
 
-    Transaction(int id, double amount, String type, String category, String description, LocalDate date){
+    Transaction(int id, double amount, String type, String category, String description, LocalDate date, int userId) {
         this.id = id;
         this.amount = amount;
         this.type = type;
         this.category = category;
         this.description = description;
         this.date = date;
+        this.userId = userId;
     }
-    Transaction(double amount, String type, String category, String description, LocalDate date){
+    Transaction(double amount, String type, String category, String description, LocalDate date, int userId) {
         this.amount = amount;
         this.type = type;
         this.category = category;
         this.description = description;
         this.date = date;
+        this.userId = userId;
     }
 
     public void setId(int id){
@@ -67,7 +70,14 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return "Transaction id: " + id +", Amount: " + amount + ", Type: " + type + ", Category: " + category + ", Description: " + description + ", Date: " + date;
+        return "Transaction id: " + id +", Amount: " + amount + ", Type: " + type + ", Category: " + category + ", Description: " + description + ", Date: " + date
+                + ", User ID: " + userId;
 
+    }
+    public int getUserId() {
+        return userId;
+    }
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }

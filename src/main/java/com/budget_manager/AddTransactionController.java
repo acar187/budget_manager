@@ -100,7 +100,7 @@ public class AddTransactionController {
             return;
         }
 
-        Transaction transaction = new Transaction(amount, type, category, description, date);
+        Transaction transaction = new Transaction(amount, type, category, description, date, Session.getCurrentUser().getId());
         TransactionDAO.insertTransaction(transaction);
          if (onSaveCallback != null) {
                 onSaveCallback.run();

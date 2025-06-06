@@ -27,7 +27,10 @@ public class TransactionDAO {
                 rs.getString("type"), 
                 rs.getString("category"), 
                 rs.getString("description"), 
-                rs.getDate("date").toLocalDate());   
+                rs.getDate("date").toLocalDate(),
+                rs.getInt("user_id")
+                ); 
+                  
         
             list.add(t);
         }
@@ -39,12 +42,15 @@ public class TransactionDAO {
     }
 
     public static void insertTransaction(Transaction t) {
-        String sql = "INSERT INTO transactions (amount, type, category, description, date) VALUES (" +
+        System.out.println("Inserting transaction for user_id: " + t.getUserId());
+
+        String sql = "INSERT INTO transactions (amount, type, category, description, date, user_id) VALUES (" +
                 t.getAmount() + ", '" +
                 t.getType() + "', '" +
                 t.getCategory() + "', '" +
                 t.getDescription() + "', '" +
-                t.getDate() + "')";
+                t.getDate() + "', '" +
+                t.getUserId() +"')";
 
         try (Connection conn = DatabaseManager.getConnection();
              Statement stmt = conn.createStatement()) {
@@ -80,5 +86,31 @@ public class TransactionDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static List<Transaction> getTransactionsByUser(int id) {
+        List<Transaction> list = new ArrayList<>();
+        String sql = "SELECT * FROM transactions WHERE user_id = " + id;
+
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Transaction t = new Transaction(
+                    rs.getInt("id"),
+                    rs.getDouble("amount"),
+                    rs.getString("type"), 
+                    rs.getString("category"), 
+                    rs.getString("description"), 
+                    rs.getDate("date").toLocalDate(),
+                    rs.getInt("user_id"));
+
+                list.add(t);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }
