@@ -20,8 +20,8 @@
                   <Button mnemonicParsing="false" onAction="#onRegister" text="Register" />
                </children>
             </HBox>
-            <Label fx:id="errorLabel" />
          </children>
       </VBox>
+      <Label fx:id="errorLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="2.0" layoutY="320.0" prefHeight="17.0" prefWidth="600.0" />
    </children>
 </AnchorPane>

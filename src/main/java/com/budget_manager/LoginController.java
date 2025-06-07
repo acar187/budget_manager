@@ -19,8 +19,9 @@ public class LoginController {
     Boolean Registered = false;
     
     public void onLogin() throws SQLException, IOException {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
+
 
         User user = UserDAO.login(username, password);
         if (user != null) {
@@ -50,8 +51,13 @@ public class LoginController {
     }
 
     public void onRegister() throws IOException, SQLException {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
+
+        if (username.isEmpty() || password.isEmpty() || username == null || password == null || username.equals("Username") || password.equals("Password")) {
+            errorLabel.setText("Username and password cannot be empty.");
+            return;
+        }
 
         Registered = UserDAO.registerUser(username, password);
         if (!Registered) {
