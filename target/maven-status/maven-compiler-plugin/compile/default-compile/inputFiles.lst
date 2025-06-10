@@ -1,6 +1,7 @@
 /Users/erkanacar/java_files/budget_manager/src/main/java/com/budget_manager/Category.java
 /Users/erkanacar/java_files/budget_manager/src/main/java/com/budget_manager/CategoryDAO.java
 /Users/erkanacar/java_files/budget_manager/src/main/java/com/budget_manager/ManageCategoriesController.java
+/Users/erkanacar/java_files/budget_manager/src/main/java/com/budget_manager/CurrencyConverter.java
 /Users/erkanacar/java_files/budget_manager/src/main/java/com/budget_manager/DatabaseManager.java
 /Users/erkanacar/java_files/budget_manager/src/main/java/com/budget_manager/EditTransactionController.java
 /Users/erkanacar/java_files/budget_manager/src/main/java/com/budget_manager/Transaction.java

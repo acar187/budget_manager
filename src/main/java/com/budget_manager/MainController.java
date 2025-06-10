@@ -46,15 +46,36 @@ public class MainController{
     private TableColumn<Transaction, String> dateColumn;
     @FXML   
     private TableColumn<Transaction, String> amountColumn;
+    @FXML
+    private TableColumn<Transaction, String> amountLiraColumn;
 
     @FXML private PieChart expensePieChart;
 
     @FXML private Label incomeSumLabel;
     @FXML private Label expenseSumLabel;
     @FXML private Label balanceLabel;
+
+    @FXML private Label incomeSumBTCLabel;
+    @FXML private Label expenseSumBTCLabel;
+    @FXML private Label balanceBTCLabel;
+
+    @FXML private Label incomeSumETHLabel;
+    @FXML private Label expenseSumETHLabel;
+    @FXML private Label balanceETHLabel;
     
     private final ObservableList<Transaction> transactionList = FXCollections.observableArrayList();
     private final ObservableList<Category> categoriesList = FXCollections.observableArrayList();
+    private double euroToLiraRate = 0.0;
+
+    @FXML
+    private TableColumn<Transaction, String> amountBTCColumn;
+    @FXML
+    private TableColumn<Transaction, String> amountETHColumn;
+
+    private double euroToBtcRate = 0.0;
+    private double euroToEthRate = 0.0;
+
+
 
     public void initialize() {
         dateColumn.setCellValueFactory(data -> 
@@ -68,7 +89,12 @@ public class MainController{
             javafx.beans.binding.Bindings.createStringBinding(data.getValue()::getDescription));
         amountColumn.setCellValueFactory(data -> 
             javafx.beans.binding.Bindings.createStringBinding(() -> String.format("%.2f", data.getValue().getAmount())));
-
+        //amountLiraColumn.setCellValueFactory(data ->
+            //javafx.beans.binding.Bindings.createStringBinding(() -> String.format("%.2f", data.getValue().getAmount() * euroToLiraRate)));
+        amountBTCColumn.setCellValueFactory(data ->
+            javafx.beans.binding.Bindings.createStringBinding(() -> euroToBtcRate > 0 ? String.format("%.8f", data.getValue().getAmount() / euroToBtcRate) : "..."));
+        amountETHColumn.setCellValueFactory(data -> 
+            javafx.beans.binding.Bindings.createStringBinding(() -> euroToEthRate > 0 ? String.format("%.8f", data.getValue().getAmount() / euroToEthRate) : "..."));
 
         transactionTable.setItems(transactionList);
          // Lade Daten beim Start
@@ -76,8 +102,39 @@ public class MainController{
         transactionList.setAll(TransactionDAO.getTransactionsByUser(Session.getCurrentUser().getId()));
         updateSums();
         updateExpensePieChart();
-         // Delay focus until after UI is rendered
-        javafx.application.Platform.runLater(() -> transactionTable.requestFocus());
+
+        // Wechselkurs asynchron laden und Tabelle aktualisieren
+    // new Thread(() -> {
+    //     double rate = CurrencyConverter.getEuroToLiraRate();
+    //     if (rate > 0) {
+    //         euroToLiraRate = rate;
+    //         javafx.application.Platform.runLater(() -> transactionTable.refresh());
+
+    //     }
+    // }).start();
+
+        // BTC-Kurs laden
+    new Thread(() -> {
+    double btc = CurrencyConverter.getEuroToBTC();
+    if (btc > 0) {
+        euroToBtcRate = btc;
+        javafx.application.Platform.runLater(() -> {
+            transactionTable.refresh();
+            updateSums(); // <-- beides im FX-Thread!
+        });
+    }
+}).start();
+
+new Thread(() -> {
+    double eth = CurrencyConverter.getEuroToETH();
+    if (eth > 0) {
+        euroToEthRate = eth;
+        javafx.application.Platform.runLater(() -> {
+            transactionTable.refresh();
+            updateSums();
+        });
+    }
+}).start();
     }
 
     @FXML
@@ -209,25 +266,72 @@ public class MainController{
         //transactionList.setAll(TransactionDAO.getAllTransactions());
         transactionList.setAll(TransactionDAO.getTransactionsByUser(Session.getCurrentUser().getId()));
         updateSums();
+        updateExpensePieChart();
     }
+
+    // private void updateSums() {
+    //     double income = transactionList.stream()
+    //         .filter(t -> "INCOME".equalsIgnoreCase(t.getType()))
+    //         .mapToDouble(Transaction::getAmount)
+    //         .sum();
+
+    //     double expense = transactionList.stream()
+    //         .filter(t -> "EXPENSE".equalsIgnoreCase(t.getType()))
+    //         .mapToDouble(Transaction::getAmount)
+    //         .sum();
+
+    //     double balance = income - expense;
+
+    //     incomeSumLabel.setText(String.format("Income: %.2f €", income));
+    //     expenseSumLabel.setText(String.format("Expense: %.2f €", expense));
+    //     balanceLabel.setText(String.format("Balance: %.2f €", balance));
+    // }
 
     private void updateSums() {
-        double income = transactionList.stream()
-            .filter(t -> "INCOME".equalsIgnoreCase(t.getType()))
-            .mapToDouble(Transaction::getAmount)
-            .sum();
+    double income = transactionList.stream()
+        .filter(t -> "INCOME".equalsIgnoreCase(t.getType()))
+        .mapToDouble(Transaction::getAmount)
+        .sum();
 
-        double expense = transactionList.stream()
-            .filter(t -> "EXPENSE".equalsIgnoreCase(t.getType()))
-            .mapToDouble(Transaction::getAmount)
-            .sum();
+    double expense = transactionList.stream()
+        .filter(t -> "EXPENSE".equalsIgnoreCase(t.getType()))
+        .mapToDouble(Transaction::getAmount)
+        .sum();
 
-        double balance = income - expense;
+    double balance = income - expense;
 
-        incomeSumLabel.setText(String.format("Income: %.2f €", income));
-        expenseSumLabel.setText(String.format("Expense: %.2f €", expense));
-        balanceLabel.setText(String.format("Balance: %.2f €", balance));
+    incomeSumLabel.setText(String.format("%.2f €", income));
+    expenseSumLabel.setText(String.format("%.2f €", expense));
+    balanceLabel.setText(String.format("%.2f €", balance));
+
+    // BTC
+    if (euroToBtcRate > 0) {
+        double incomeBTC = income / euroToBtcRate;
+        double expenseBTC = expense / euroToBtcRate;
+        double balanceBTC = balance / euroToBtcRate;
+        incomeSumBTCLabel.setText(String.format("%.8f BTC", incomeBTC));
+        expenseSumBTCLabel.setText(String.format("%.8f BTC", expenseBTC));
+        balanceBTCLabel.setText(String.format("%.8f BTC", balanceBTC));
+    } else {
+        incomeSumBTCLabel.setText("... BTC");
+        expenseSumBTCLabel.setText("... BTC");
+        balanceBTCLabel.setText("... BTC");
     }
+
+    // ETH
+    if (euroToEthRate > 0) {
+        double incomeETH = income / euroToEthRate;
+        double expenseETH = expense / euroToEthRate;
+        double balanceETH = balance / euroToEthRate;
+        incomeSumETHLabel.setText(String.format("%.8f ETH", incomeETH));
+        expenseSumETHLabel.setText(String.format("%.8f ETH", expenseETH));
+        balanceETHLabel.setText(String.format("%.8f ETH", balanceETH));
+    } else {
+        incomeSumETHLabel.setText("... ETH");
+        expenseSumETHLabel.setText("... ETH");
+        balanceETHLabel.setText("... ETH");
+    }
+}
 
     private void updateExpensePieChart() {
     //     Map<String, Double> categorySums = transactionList.stream()

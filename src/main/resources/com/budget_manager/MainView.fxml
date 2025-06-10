@@ -43,11 +43,14 @@
 </HBox>
       <TableView fx:id="transactionTable" prefHeight="347.0" prefWidth="1045.0">
         <columns>
-          <TableColumn fx:id="dateColumn" prefWidth="150.0" text="Date" />
-          <TableColumn fx:id="typeColumn" prefWidth="150.0" text="Type" />
-            <TableColumn fx:id="categoryColumn" minWidth="0.0" prefWidth="150.0" text="Category" />
-            <TableColumn fx:id="descriptionColumn" prefWidth="150.0" text="Description" />
-            <TableColumn fx:id="amountColumn" minWidth="0.0" prefWidth="150.0" text="Amount (€)" />
+          <TableColumn fx:id="dateColumn" prefWidth="140.0" text="Date" />
+          <TableColumn fx:id="typeColumn" prefWidth="140.0" text="Type" />
+            <TableColumn fx:id="categoryColumn" minWidth="0.0" prefWidth="140.0" text="Category" />
+            <TableColumn fx:id="descriptionColumn" prefWidth="140.0" text="Description" />
+            <TableColumn fx:id="amountColumn" minWidth="0.0" prefWidth="140.0" text="Amount (€)" />
+            <!--<TableColumn fx:id="amountLiraColumn" prefWidth="181.0" text="Amount  Türkish Lira (₺)" />-->
+            <TableColumn fx:id="amountBTCColumn" prefWidth="140" text="Amount (BTC)" />
+            <TableColumn fx:id="amountETHColumn" prefWidth="140" text="Amount (ETH)" />
         </columns>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -55,15 +58,28 @@
       </TableView>
       <HBox alignment="CENTER" prefHeight="47.0" prefWidth="1037.0" spacing="60.0">
          <children>
-            <Label fx:id="incomeSumLabel" text="Income: " />
-            <HBox alignment="CENTER" prefHeight="145.0" prefWidth="390.0" spacing="10.0">
+            <VBox alignment="CENTER" prefHeight="150.0" prefWidth="324.0">
                <children>
-                  <Label fx:id="expenseSumLabel" prefHeight="17.0" prefWidth="113.0" text="Expense:">
-                     <HBox.margin>
+                  <Label fx:id="incomeSumLabelHeader" alignment="CENTER" contentDisplay="RIGHT" prefHeight="20.0" prefWidth="122.0" text="Total Income: " VBox.vgrow="ALWAYS">
+                     <VBox.margin>
                         <Insets />
-                     </HBox.margin>
-                  </Label>
-                  <PieChart fx:id="expensePieChart" prefHeight="150.0" prefWidth="114.0">
+                     </VBox.margin></Label>
+                     <Label fx:id="incomeSumLabel" alignment="BASELINE_RIGHT" contentDisplay="RIGHT" />
+                  <Label fx:id="incomeSumBTCLabel" alignment="BASELINE_RIGHT" contentDisplay="RIGHT" />
+                  <Label fx:id="incomeSumETHLabel" alignment="BASELINE_RIGHT" contentDisplay="RIGHT" />
+               </children>
+            </VBox>
+            <HBox alignment="CENTER" prefHeight="150.0" prefWidth="528.0" spacing="10.0">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="145.0" prefWidth="170.0">
+                     <children>
+                        <Label fx:id="expenseSumLabelHeader" alignment="CENTER" prefHeight="17.0" prefWidth="244.0" text="Total Expense:" VBox.vgrow="ALWAYS" />
+                        <Label fx:id="expenseSumLabel" alignment="BASELINE_LEFT" />
+                        <Label fx:id="expenseSumBTCLabel" alignment="BASELINE_LEFT" />
+                        <Label fx:id="expenseSumETHLabel" alignment="BASELINE_LEFT" />
+                     </children>
+                  </VBox>
+                  <PieChart fx:id="expensePieChart" prefHeight="133.0" prefWidth="80.0">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
@@ -73,10 +89,14 @@
                   <Insets left="50.0" right="50.0" />
                </HBox.margin>
             </HBox>
-            <Label fx:id="balanceLabel" text="Balance:">
-               <HBox.margin>
-                  <Insets left="-50.0" />
-               </HBox.margin></Label>
+            <VBox alignment="CENTER" prefHeight="150.0" prefWidth="366.0">
+               <children>
+                  <Label fx:id="balanceLabelHeader" text="Balance:" VBox.vgrow="ALWAYS" />
+                  <Label fx:id="balanceLabel" />
+                  <Label fx:id="balanceBTCLabel" />
+                  <Label fx:id="balanceETHLabel" />
+               </children>
+            </VBox>
          </children>
          <opaqueInsets>
             <Insets />
