@@ -7,7 +7,9 @@ com/budget_manager/User.class
 com/budget_manager/UserDAO.class
 com/budget_manager/Main.class
 com/budget_manager/ManageCategoriesController.class
+com/budget_manager/LoginController.class
 com/budget_manager/Category.class
 com/budget_manager/AddTransactionController.class
 com/budget_manager/CategoryDAO.class
 com/budget_manager/MainController.class
+com/budget_manager/CurrencyConverter.class
